@@ -11,23 +11,23 @@
 Save data from a Instagram takeout to a SQLite database.
 
 
-## Installation
+## Mise En Place
 
 ```bash
 git clone https://github.com/gavindsouza/instagram-to-sqlite
 pip install -e ./instagram-to-sqlite
 ```
 
-This tool only supports JSON data takeouts.
+> This tool only supports JSON data takeouts.
 
-## Something
+## Ricing the potatoes
 
     $ instagram-to-sqlite chats insta-chats.db ~/Downloads/takeout-20190530.zip
 
 This will create a database file called `insta-chats.db` if one does not already exist.
 
 
-## Browsing your data with Datasette
+## Serving with the steak
 
 Once you have imported Instagram data into a SQLite database file you can browse your data using [Datasette](https://github.com/simonw/datasette). Install Datasette like so:
 
@@ -39,9 +39,71 @@ Next run
 datasette insta-chats.db -o
 ```
 
-Read more about datasette in [the docs](https://docs.datasette.io/en/stable/).
+If you're new to SQL but still want to see what you could do with this, then
+
+1. Find out what was the first message ever sent on any of your instagram chat rooms*
+
+```sql
+SELECT
+    chat_room "Room", sender_name "Sender", coalesce(content, share, photos, videos, users, audio_files) "Message"
+FROM
+    chats_messages
+GROUP BY
+    chat_room
+HAVING
+    min(timestamp_ms)
+ORDER BY
+    timestamp_ms
+```
+
+Chat rooms refer to any regular, cross-platform or group chat.
+
+
+2. Awhhgee, how about the second messages? A bit unrealistic but still...maybe you really have to KNOW
+
+```sql
+WITH ordered_messages
+     AS (SELECT *,
+                Row_number()
+                  OVER (
+                    partition BY chat_room
+                    ORDER BY timestamp_ms) AS 'rank'
+         FROM   chats_messages
+         )
+SELECT
+    chat_room "Room", sender_name "Sender", coalesce(content, share, photos, videos, users, audio_files) "Message"
+FROM
+    ordered_messages
+WHERE
+    rank = 2
+ORDER BY
+    timestamp_ms ASC
+```
+
+3. Okay cool, what if I just want to start reading my chats from their inception like a...normal person...?
+
+```sql
+SELECT
+    type, sender_name, DATETIME(ROUND(timestamp_ms / 1000), 'unixepoch') "Date", coalesce(content, share, photos, videos, users, audio_files) "Message"
+FROM
+    chats_messages
+WHERE
+    chat_room = '{chat_room}'
+ORDER BY
+    timestamp_ms
+```
+
+You will have to figure out the chat_room ID you want to query, but it won't be hard to figure that out.
+
+## References
+
+* Read more about datasette in [the docs](https://docs.datasette.io/en/stable/).
+
+* Checkout the [dogsheep project](https://dogsheep.github.io) if you're interested in building your personal data warehouse ;)
 
 ## Pending stuff
+
+This is the rest of the data available in the Instagram takeout that I haven't built import tools for, yet. Currently, only chat data is covered.
 
 ```json
 other_data = {
