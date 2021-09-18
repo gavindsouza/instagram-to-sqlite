@@ -82,7 +82,14 @@ def save_my_chats(db, zf):
         for filename in all_chats:
             reaction_rows = []
             path = os.path.splitext(filename)[0]
-            chat_room = path.split(os.sep)[2]
+
+            try:
+                chat_room = path.split(os.sep)[2]
+            except Exception:
+                # if the path doesnt fit the pattern, skip it - added while secret
+                # groups came in. but i had no data to test it with
+                continue
+
             chat_content = json.load(zf.open(filename))
 
             # 1. transform and insert meta data
