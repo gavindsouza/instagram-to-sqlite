@@ -11,7 +11,7 @@
 Save data from a Instagram takeout to a SQLite database.
 
 
-## Mise En Place
+## Mise en Place
 
 ```bash
 git clone https://github.com/gavindsouza/instagram-to-sqlite
@@ -106,7 +106,7 @@ You will have to figure out the chat_room ID you want to query, but it won't be 
 This is the rest of the data available in the Instagram takeout that I haven't built import tools for, yet. Currently, only chat data is covered.
 
 ```json
-other_data = {
+{
     "login_and_account_creation": [
         "login_activity.json", "logout_activity.json",
         "signup_information.json", "password_change_activity.json",
