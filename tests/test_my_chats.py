@@ -9,6 +9,4 @@ def test_my_chats():
     db = Database(memory=True)
     save_my_chats(db, zf)
 
-    assert {
-        "chats_meta", "chats_messages", "chats_reactions"
-    } == set(db.table_names())
+    assert {"chats_meta", "chats_messages", "chats_reactions"} == set(db.table_names())
