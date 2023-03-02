@@ -4,7 +4,7 @@ from types import SimpleNamespace
 from typing import Any
 
 import click
-from sqlite_utils.db import _hash
+from sqlite_utils.utils import hash_record
 
 
 class Namespace(SimpleNamespace):
@@ -117,7 +117,7 @@ def save_my_chats(db, zf):
 
             reactioned_messages = list(filter(lambda x: x.get("reactions"), chat_rows))
             for rm in reactioned_messages:
-                rm["id"] = _hash(rm)
+                rm["id"] = hash_record(rm)
                 reactions = rm.pop("reactions", [])
                 for reaction in reactions:
                     reaction_rows.append({"message_id": rm["id"], **reaction})
@@ -134,7 +134,7 @@ def save_my_chats(db, zf):
                 filter(lambda x: not x.get("reactions"), chat_rows)
             )
             for nrm in non_reactioned_messages:
-                nrm["id"] = _hash(nrm)
+                nrm["id"] = hash_record(nrm)
 
             db["chats_messages"].upsert_all(
                 non_reactioned_messages,

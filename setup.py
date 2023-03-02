@@ -26,7 +26,7 @@ setup(
         [console_scripts]
         instagram-to-sqlite=instagram_to_sqlite.cli:cli
     """,
-    install_requires=["sqlite-utils"],
+    install_requires=["sqlite-utils>=3.30"],
     extras_require={"test": ["pytest"]},
     tests_require=["instagram-to-sqlite[test]"],
 )
