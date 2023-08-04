@@ -1,10 +1,13 @@
 import json
 import os
 from types import SimpleNamespace
-from typing import Any
+from zipfile import ZipFile
 
 import click
 from sqlite_utils.utils import hash_record
+from sqlite_utils import Database
+
+from ._typing import InstagramChat, Any, Iterable
 
 
 class Namespace(SimpleNamespace):
@@ -67,7 +70,7 @@ CHAT = Namespace(
 )
 
 
-def save_my_chats(db, zf):
+def save_my_chats(db: Database, zf: ZipFile):
     """Generates 3 tables for: meta, messages & reactions"""
     all_chats = [
         f.filename
@@ -81,7 +84,7 @@ def save_my_chats(db, zf):
     with click.progressbar(all_chats, label="Saving Chats") as all_chats:
         for filename in all_chats:
             reaction_rows = []
-            path = os.path.splitext(filename)[0]
+            path: str = os.path.splitext(filename)[0]
 
             try:
                 chat_room = path.split(os.sep)[2]
@@ -90,7 +93,7 @@ def save_my_chats(db, zf):
                 # groups came in. but i had no data to test it with
                 continue
 
-            chat_content = json.load(zf.open(filename))
+            chat_content: InstagramChat = json.load(zf.open(filename))
 
             # 1. transform and insert meta data
             meta_row = _(
@@ -157,7 +160,7 @@ def save_my_chats(db, zf):
         generate_indexes(db, tables_to_setup)
 
 
-def generate_indexes(db, tables_to_setup):
+def generate_indexes(db: Database, tables_to_setup: Iterable[str]):
     if not tables_to_setup:
         return
 
