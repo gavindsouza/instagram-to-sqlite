@@ -97,7 +97,8 @@ def save_my_chats(db, zf):
                 {
                     "chat_room": chat_room,
                     "title": chat_content["title"],
-                    "thread_type": chat_content["thread_type"],
+                    "thread_type": chat_content.get("thread_type"),
+                    "magic_words": chat_content.get("magic_words"),
                     "thread_path": chat_content["thread_path"],
                     "is_still_participant": chat_content["is_still_participant"],
                 }
