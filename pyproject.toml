@@ -11,7 +11,8 @@ authors = [{ name = "Gavin D'souza"}]
 license = "Apache-2.0"
 urls = { "Homepage" = "https://github.com/gavindsouza/instagram-to-sqlite" }
 dependencies = [
-    "sqlite-utils>=3.30"
+    "sqlite-utils==3.38",
+    "datasette",
 ]
 
 [project.optional-dependencies]

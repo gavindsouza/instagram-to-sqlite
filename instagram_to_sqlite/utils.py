@@ -75,25 +75,73 @@ def save_my_chats(db: Database, zf: ZipFile):
     all_chats = [
         f.filename
         for f in zf.filelist
-        if f.filename.startswith("messages") and f.filename.endswith(".json")
+        if f.filename.find("messages") and f.filename.endswith(".json")
     ]
+
     tables_to_setup = filter(
         lambda x: x not in db.table_names(),
         ["chats_meta", "chats_messages", "chats_reactions"],
     )
+
     with click.progressbar(all_chats, label="Saving Chats") as all_chats:
         for filename in all_chats:
             reaction_rows = []
             path: str = os.path.splitext(filename)[0]
 
             try:
-                chat_room = path.split(os.sep)[2]
+                chat_room = path.split(os.sep)[3]
             except Exception:
                 # if the path doesnt fit the pattern, skip it - added while secret
                 # groups came in. but i had no data to test it with
                 continue
 
             chat_content: InstagramChat = json.load(zf.open(filename))
+
+            if isinstance(chat_content, list):
+                # skipping when chat content is a list
+                # list[dict] key was media
+                continue
+
+            # New objects that have appeared with the following signature:
+            # dict_keys(['account_history_registration_info'])
+            # dict_keys(['settings_allow_comments_from'])
+            # dict_keys(['settings_notification_preferences'])
+            # dict_keys(['settings_upgraded_to_cross_app_messaging'])
+            # dict_keys(['timestamp', 'media', 'label_values', 'fbid'])
+            # dict_keys(['topics_your_topics'])
+            # dict_keys(['inferred_data_primary_location'])
+            # dict_keys(['profile_friend_map'])
+            # dict_keys(['profile_account_insights'])
+            # dict_keys(['profile_note_interactions'])
+            # dict_keys(['profile_user'])
+            # dict_keys(['profile_business'])
+            # dict_keys(['profile_profile_change'])
+            # dict_keys(['profile_media_reposts'])
+            # dict_keys(['devices_two_factor_authentication'])
+            # dict_keys(['devices_camera'])
+            # dict_keys(['devices_devices'])
+            # dict_keys(['relationships_dismissed_suggested_users'])
+            # dict_keys(['relationships_blocked_users'])
+            # dict_keys(['relationships_close_friends'])
+            # dict_keys(['relationships_follow_requests_received'])
+            # dict_keys(['relationships_following'])
+            # dict_keys(['relationships_following_hashtags'])
+            # dict_keys(['relationships_hide_stories_from'])
+            # dict_keys(['relationships_follow_requests_sent'])
+            # dict_keys(['relationships_feed_favorites'])
+            # dict_keys(['relationships_permanent_follow_requests'])
+            # dict_keys(['relationships_unfollowed_users'])
+            # dict_keys(['contacts_contact_info'])
+            # dict_keys(['searches_user'])
+            # dict_keys(['searches_keyword'])
+            # dict_keys(['organic_insights_posts'])
+            # dict_keys(['organic_insights_live'])
+            # dict_keys(['timestamp', 'media', 'label_values', 'fbid'])
+            # dict_keys(['apps_and_websites_off_meta_activity'])
+
+            if not chat_content.get("title"):
+                # skipping empty chats
+                continue
 
             # 1. transform and insert meta data
             meta_row = _(
