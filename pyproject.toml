@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "instagram-to-sqlite"
+version = "0.0.1"
+description = "Convert data from Instagram Takeout to a SQLite database"
+readme = "README.md"
+authors = [{ name = "Gavin D'souza"}]
+license = "Apache-2.0"
+urls = { "Homepage" = "https://github.com/gavindsouza/instagram-to-sqlite" }
+dependencies = [
+    "sqlite-utils>=3.30"
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest"
+]
+
+[project.scripts]
+instagram-to-sqlite = "instagram_to_sqlite.cli:cli"
+
+[tool.setuptools]
+packages = ["instagram_to_sqlite"]
