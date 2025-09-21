@@ -112,3 +112,5 @@ ENV/
 # others
 *.pickle
 .directory
+.direnv
+data/
